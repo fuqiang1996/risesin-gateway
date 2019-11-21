@@ -1,0 +1,62 @@
+server:
+  port: 5003
+
+#xss攻击拦截
+xss:
+  enabled: true
+  excludes:
+  urlPatterns: /*
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      # 聚合文档配置
+      routes:
+        - id: 系统用户模块
+          uri: lb://risesin-system-service
+          predicates:
+            - Path=/system/**  # 路由規則
+        - id: 核心服务模块
+          uri: lb://risesin-core-service
+          predicates:
+            - Path=/core/**
+        - id: 企业用户服务模块
+          uri: lb://risesin-enterprise-user-service
+          predicates:
+            - Path=/enterprise/**
+    loadbalancer:
+      retry:
+        enabled: true
+  application:
+    name: gateway-server
+  # mysql
+  datasource:
+    username: root
+    password: go_ROOT<0
+    url: jdbc:mysql://192.168.1.199:3306/risesin?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+  main:
+    allow-bean-definition-overriding: true  # 因有程序中显示有类名一致,但查找又没有,故加此配置可以启动不报错
+
+management:
+  health:
+    redis:
+      enabled: false
+
+eureka:
+  instance:
+    hostname: 192.168.1.107
+    prefer-ip-address: true  #访问路径可以显示IP地址
+  #客户端
+  client:
+    #注册中心地址
+    service-url:
+      defaultZone: http://192.168.1.200:5000/eureka/,http://192.168.1.198:5001/eureka/,http://192.168.1.197:5002/eureka/
+
+logging:
+  level:
+    org.springframework:cloud.gateway: debug
+
+
